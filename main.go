@@ -6,6 +6,7 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/alexflint/go-arg"
@@ -71,8 +72,14 @@ func main() {
 		body += "\t\"github.com/google/wire\"\n)\n\n"
 
 		body += fmt.Sprintf("var %sSet = wire.NewSet(\n", pack.Name)
+		funcNames := make([]string, 0, len(funcs))
 		for _, f := range funcs {
-			body += fmt.Sprintf("\t%s.%s,\n", pack.Name, f.Name.Name)
+			funcNames = append(funcNames, f.Name.Name)
+		}
+		slices.Sort(funcNames)
+
+		for _, f := range funcNames {
+			body += fmt.Sprintf("\t%s.%s,\n", pack.Name, f)
 		}
 		body += ")\n"
 
